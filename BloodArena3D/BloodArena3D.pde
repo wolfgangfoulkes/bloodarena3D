@@ -36,7 +36,7 @@ int X_SIZE = 1001;
 int Z_SIZE = 1001;
 int TERRAIN_SLICES = 16;
 float TERRAIN_HORIZON = 300;
-float TERRAIN_AMP = 70;
+float TERRAIN_AMP = 70; 
 
 //-----CONSTANTS for Objects
 int height_OFFSET = 50;
@@ -73,8 +73,6 @@ PImage terrainTexCur;
 PImage skyTexCur;
 PImage killScreen;
 
-//PShader lines;
-//PShader noise;
 PShader SHADER_NOISE;
 PShader SHADER_LASER;
 PShader SHADER_CROSSHAIR;
@@ -84,18 +82,20 @@ PShader SHADER_MELEE;
 PVector acc = new PVector(0, 0, 0); //can we set Camera directly from OSC?
 PVector joystick = new PVector(0, 0, 0);
 
-
+/*
 boolean sketchFullScreen()
 {
   return true;
 }
+*/
+
 
 
 void setup() 
 {
   smooth();
-  //size(900, 900, P3D);
-  size(displayWidth, displayHeight, P3D);
+  size(900, 900, P3D);
+  //size(displayWidth, displayHeight, P3D);
   frameRate(24);
   
   pos_in = new OscP5(this, cinport);
@@ -542,7 +542,7 @@ void keyPressed()
     case 'f': disconnect(lport, myprefix); connected = false; break;
     case 'R': roster.print(); break;
     case 'M': map.print(); break;
-    case 'I': loop(); randomSpawnCamera(5000); break;
+    case 'I': loop(); SHOTS = 10; if (map.checkBounds(TEMP_SPAWN) == -1) { cam.spawnCamera(TEMP_SPAWN, new PVector(0, 0, 0)); } else { println("spawning out of bounds at: "+TEMP_SPAWN+""); } break;
     case 'v': cam.living = false; sendKill(myprefix, myLocation); sendKill(myprefix, myBroadcastLocation); break; //cam.living = false; killCamera(); (myprefix); break;
     
     //temp testing variables
@@ -559,7 +559,7 @@ void keyPressed()
     case 'm': acc.y = -1; break;
     case 'P': newPlayer();break;
     case 'O': sendExplosion(); break;
-    cawe 'T': initTextures(); break;
+    case 'T': initTextures(); break;
     case 'c': 
     {
       sendMelee(1, myLocation);
@@ -652,10 +652,9 @@ PVector adjustY(PVector ipv, Terrain it, float ihover)
 }
 
 void initTextures() //probably not this.
-{//for syncing texture changes
-  //texGlobe = loadImage(skyTex[texCycle]);   
-  laserTexCur = loadImage( laserTex[ random(0, lasetTex.length()-1) ] );
-  terrainTexCur = loadImage( terrainTex[texCycle] );
+{//for syncing texture changes  
+  laserTexCur = loadImage( laserTex[ (int) random(0, laserTex.length - 1) ] );
+  terrainTexCur = loadImage( terrainTex[ (int) random(0, terrainTex.length - 1) ] );
   terrain.setTexture(terrainTexCur, TERRAIN_SLICES);
   terrain.drawMode(S3D.TEXTURE);
   map.setTex(terrainTexCur);
