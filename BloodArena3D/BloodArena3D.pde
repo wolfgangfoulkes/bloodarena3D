@@ -36,7 +36,7 @@ int X_SIZE = 1001;
 int Z_SIZE = 1001;
 int TERRAIN_SLICES = 16;
 float TERRAIN_HORIZON = 300;
-float TERRAIN_AMP = 70;
+float TERRAIN_AMP = 70; 
 
 //-----CONSTANTS for Objects
 int height_OFFSET = 50;
@@ -89,6 +89,7 @@ boolean sketchFullScreen()
 {
   return true;
 }
+
 
 
 void setup() 
