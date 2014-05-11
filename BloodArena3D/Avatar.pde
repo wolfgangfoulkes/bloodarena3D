@@ -74,7 +74,7 @@ class Avatar extends O3DCone
       SHADER_LASER.set("thresh2", 0.9 * lifespan * lifespan);
       
       SHADER_LASER.set("rate1", 30.0);
-      SHADER_LASER.set("rate2", 20.0);
+      SHADER_LASER.set("rate2", 30.0);
       SHADER_LASER.set("color", shiftGlobalColors());
       shader(SHADER_LASER);
       laser.update(); //right now, this's all that'd be in "update" for any object excepting the camera.

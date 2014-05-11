@@ -2,6 +2,8 @@ import oscP5.*;
 import netP5.*;
 import papaya.*;
 import java.util.*; 
+import java.util.concurrent.*;
+
 import processing.video.*;
 //import processing.opengl.*;
 import shapes3d.*;
@@ -20,10 +22,10 @@ int lport = 12002;
 int coutport = 14000;
 int cinport = 14001;
 int bcport = 32000;
-String BROADCAST_LOCATION = "169.254.7.168";
+String BROADCAST_LOCATION = "169.254.212.75";
 NetAddress myLocation;
 NetAddress myBroadcastLocation; 
-String myprefix = "/tw33k";
+String myprefix = "/twerk";
 
 PApplet APPLET = this;
 Map map;
@@ -429,7 +431,6 @@ void oscEvent(OscMessage theOscMessage)
       {
         sendKill(myprefix, myLocation);
         cam.living = false;
-        randomSpawnCamera(5000);
       }
       else //everything below should be encapsulated.
       {
@@ -471,7 +472,7 @@ void oscEvent(OscMessage theOscMessage)
           PVector ivec = adjustY(new PVector(ix, iy, iz), terrain, height_OFFSET);
           PVector isize = new PVector(random(20, 90), random(90, 180), random(20, 90));  
           Avatar ia = new Avatar(iplayer, ivec, new PVector(0, 0, 0), isize);
-          iplayer.avatar = (map.add(ia) != -1) ? ia : null; 
+          iplayer.avatar = (map.add(ia)) ? ia : null; 
           //if avatar is successfully added to the map, else set player's avatar pointer to null.
           //println("model:", iplayer.avatar.getModelApex());
         }
