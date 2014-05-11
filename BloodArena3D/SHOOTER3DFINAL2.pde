@@ -8,20 +8,22 @@ import shapes3d.*;
 import shapes3d.utils.*;
 import shapes3d.animation.*;
 
+//int ADEBUG = 0;
+//PVector TEMP_SPAWN = new PVector(0, 0, 0);
 boolean IS_INIT = false;
 boolean connected = false;
 
 ///////////****OSC****\\\\\\\\\\\\\
 OscP5 pos_in;
 OscP5 oscP5;
-int lport = 12000;
+int lport = 12002;
 int coutport = 14000;
 int cinport = 14001;
 int bcport = 32000;
 String BROADCAST_LOCATION = "169.254.7.168";
 NetAddress myLocation;
 NetAddress myBroadcastLocation; 
-String myprefix = "/tw333k";
+String myprefix = "/tw33k";
 
 PApplet APPLET = this;
 Map map;
@@ -99,7 +101,7 @@ void setup()
   pos_in = new OscP5(this, cinport);
   pos_in.plug(this, "accelData", "/nunchuck/accel");
   pos_in.plug(this, "joystickData", "/nunchuck/joystick");
-  //pos_in.plug(this, "chuckRespawn", "/chuck/init");
+  pos_in.plug(this, "chuckRespawn", "/chuck/init");
   pos_in.plug(this,"cButtonPing", "/nunchuck/Cbutton");
   pos_in.plug(this,"zButtonPing", "/nunchuck/Zbutton");
 
@@ -362,21 +364,6 @@ void oscEvent(OscMessage theOscMessage)
     return;
   }
   
-  if (messageaddr.equals("/chuck/init"))
-  {
-    println("respawn ping");
-    loop();
-    initTextures();
-    //map.setTex(terrainTexCur);
-    if (randomSpawnCamera(5000) == -1)
-    {
-      cam.living = false; 
-      sendKill(myprefix, myLocation);
-      sendKill(myprefix, myBroadcastLocation);
-      println("chaos reigns!");
-    }
-  }
-  
   if (messageaddr.equals("/object") && messagetag.equals("ffffffs"))
   {
     float ix = theOscMessage.get(0).floatValue();
@@ -441,9 +428,9 @@ void oscEvent(OscMessage theOscMessage)
       if (is.equals(myprefix)) 
       {
         sendKill(myprefix, myLocation);
-        cam.living = false;
-        randomSpawnCamera(5000);
         initTextures();
+        //cam.living = false;
+        randomSpawnCamera(5000);
       }
       else //everything below should be encapsulated.
       {
@@ -501,6 +488,22 @@ void oscEvent(OscMessage theOscMessage)
 }
 }
 
+/*
+public void chuckRespawn(int in)
+{
+    loop();
+    initTextures();
+    map.setTex(terrainTexCur);
+    if (randomSpawnCamera(5000) == -1)
+    {
+      cam.living = false; 
+      sendKill(myprefix, myLocation);
+      sendKill(myprefix, myBroadcastLocation);
+      println("chaos reigns!");
+    }
+}
+*/
+
 public void joystickData(int x, int z) 
 {
   if (IS_INIT == false) { return; }
@@ -532,8 +535,7 @@ public void accelData(int x, int y, int z)
       acc.y *= -1.0; //this is a "set" not an "increment.
     }
  }
-
-
+ 
 void keyPressed()
 {
   switch(key)
@@ -542,8 +544,8 @@ void keyPressed()
     case 'f': disconnect(lport, myprefix); connected = false; break;
     case 'R': roster.print(); break;
     case 'M': map.print(); break;
-    case 'I': loop(); initTextures(); map.setTex(terrainTexCur); randomSpawnCamera(5000); break;
-    case 'v': cam.living = false; sendKill(myprefix, myLocation); sendKill(myprefix, myBroadcastLocation); randomSpawnCamer(5000); break; //cam.living = false; killCamera(); (myprefix); break;
+    case 'i': loop(); randomSpawnCamera(5000); break;
+    case 'v': cam.living = false; sendKill(myprefix, myLocation); sendKill(myprefix, myBroadcastLocation); break; //cam.living = false; killCamera(); (myprefix); break;
     
     //temp testing variables
     case 'w': joystick.x = 2; break;
@@ -610,6 +612,7 @@ void keyPressed()
 
 int randomSpawnCamera(int tries) 
 {
+  initTextures();
   for (int i = 0; i <= tries; i++)
   {
     PVector pvec = new PVector(random( -(map.xsize / 2), (map.xsize / 2) ), 0, random( -(map.zsize / 2), (map.zsize / 2) ));

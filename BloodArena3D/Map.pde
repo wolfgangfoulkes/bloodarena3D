@@ -9,10 +9,12 @@ class Map
     xsize = ixs;
     zsize = izs;
     objects = new ArrayList<Object3D>(100);
+    objects.ensureCapacity(100);
   }
   
   int add(Object3D iobject) //type-check to include "?" right now.
   {
+    objects.ensureCapacity(100);
     int isIn = objects.indexOf(iobject);
     int isInBounds = checkBounds(iobject.p);
     if ( (isIn == -1) && (isInBounds == -1) )
@@ -28,6 +30,7 @@ class Map
   
   int remove(Object3D iobject)
   {
+    objects.ensureCapacity(100);
     int indexof = objects.indexOf(iobject);
     if (indexof != -1)
     {
@@ -45,6 +48,7 @@ class Map
   
   int move(Object3D iobject, PVector ipos, PVector irot)
   {
+    objects.ensureCapacity(100);
     int iindx = this.remove(iobject);
     int isInBounds = checkBounds(ipos);
     if ( (iindx != -1) ) //janky as shit.
@@ -61,6 +65,7 @@ class Map
   
   void update()
   {
+    objects.ensureCapacity(100);
     for (int i = objects.size() - 1; i >= 0; i--)
     {
       Object3D object = objects.get(i);
@@ -85,6 +90,7 @@ class Map
   
   int checkBounds(PVector icoord, float dist)
   {
+    objects.ensureCapacity(100);
     for (int i = objects.size() - 1; i >= 0; i--)
     {
       Object3D oobject = objects.get(i);
@@ -100,6 +106,7 @@ class Map
   
   int checkBounds(PVector icoord)
   {
+    objects.ensureCapacity(100);
     for (int i = objects.size() - 1; i >= 0; i--)
     {
       Object3D oobject = objects.get(i);
@@ -115,6 +122,7 @@ class Map
   
   int checkBounds(float ix, float iy, float iz)
   {
+    objects.ensureCapacity(100);
     PVector icoord = new PVector(ix, iy, iz);
     for (int i = objects.size() - 1; i >= 0; i--)
     {
@@ -175,6 +183,7 @@ class Map
   
   int getIndexByAngle(PVector ipos, PVector iaim) 
   {
+    objects.ensureCapacity(100);
     for (int i = objects.size() - 1; i >= 0; i--)
     {
       PVector vec1 = PVector.sub(iaim, ipos);
