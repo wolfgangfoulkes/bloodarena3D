@@ -8,8 +8,8 @@ import shapes3d.*;
 import shapes3d.utils.*;
 import shapes3d.animation.*;
 
-//int ADEBUG = 0;
-//PVector TEMP_SPAWN = new PVector(0, 0, 0);
+int ADEBUG = 0;
+PVector TEMP_SPAWN = new PVector(0, 0, 0);
 boolean IS_INIT = false;
 boolean connected = false;
 
@@ -119,7 +119,7 @@ void setup()
   terrain.usePerlinNoiseMap(-TERRAIN_AMP, TERRAIN_AMP, 2.125f, 2.125f);
   terrain.cam = cam.cam;
   
-  initTextures();
+  initTextures(); //here only, for now.
   
   SHADER_NOISE = loadShader("noisenormalizedfrag.glsl");
   SHADER_LASER = loadShader("sinelines2frag.glsl"); //needs color
@@ -428,8 +428,7 @@ void oscEvent(OscMessage theOscMessage)
       if (is.equals(myprefix)) 
       {
         sendKill(myprefix, myLocation);
-        initTextures();
-        //cam.living = false;
+        cam.living = false;
         randomSpawnCamera(5000);
       }
       else //everything below should be encapsulated.
@@ -488,11 +487,10 @@ void oscEvent(OscMessage theOscMessage)
 }
 }
 
-/*
+
 public void chuckRespawn(int in)
 {
     loop();
-    initTextures();
     map.setTex(terrainTexCur);
     if (randomSpawnCamera(5000) == -1)
     {
@@ -502,7 +500,7 @@ public void chuckRespawn(int in)
       println("chaos reigns!");
     }
 }
-*/
+
 
 public void joystickData(int x, int z) 
 {
@@ -544,7 +542,7 @@ void keyPressed()
     case 'f': disconnect(lport, myprefix); connected = false; break;
     case 'R': roster.print(); break;
     case 'M': map.print(); break;
-    case 'i': loop(); randomSpawnCamera(5000); break;
+    case 'I': loop(); randomSpawnCamera(5000); break;
     case 'v': cam.living = false; sendKill(myprefix, myLocation); sendKill(myprefix, myBroadcastLocation); break; //cam.living = false; killCamera(); (myprefix); break;
     
     //temp testing variables
@@ -561,7 +559,7 @@ void keyPressed()
     case 'm': acc.y = -1; break;
     case 'P': newPlayer();break;
     case 'O': sendExplosion(); break;
-    case '[': initTextures(); break;
+    cawe 'T': initTextures(); break;
     case 'c': 
     {
       sendMelee(1, myLocation);
@@ -612,7 +610,6 @@ void keyPressed()
 
 int randomSpawnCamera(int tries) 
 {
-  initTextures();
   for (int i = 0; i <= tries; i++)
   {
     PVector pvec = new PVector(random( -(map.xsize / 2), (map.xsize / 2) ), 0, random( -(map.zsize / 2), (map.zsize / 2) ));
@@ -656,9 +653,8 @@ PVector adjustY(PVector ipv, Terrain it, float ihover)
 
 void initTextures() //probably not this.
 {//for syncing texture changes
-  //texGlobe = loadImage(skyTex[texCycle]);  
-  texCycle = ((texCycle + 1) % 4);  
-  laserTexCur = loadImage( laserTex[0] );
+  //texGlobe = loadImage(skyTex[texCycle]);   
+  laserTexCur = loadImage( laserTex[ random(0, lasetTex.length()-1) ] );
   terrainTexCur = loadImage( terrainTex[texCycle] );
   terrain.setTexture(terrainTexCur, TERRAIN_SLICES);
   terrain.drawMode(S3D.TEXTURE);
