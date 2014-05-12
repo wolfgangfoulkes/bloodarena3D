@@ -1,12 +1,12 @@
 class Avatar extends O3DCone
 {
-  Player player;
-  //boolean isLiving;
+  String prefix;
   Laser laser;
   //could have a "shader" parameter that is set along with death and melee. then, we don't have to call so much if/then in display
   //PShader shader;
   float lifespan;
   float melee;
+
   
   float D_THRESH = .0001;
   float D_RATE = .94;
@@ -15,14 +15,14 @@ class Avatar extends O3DCone
   float L_THRESH = .008;
   float L_RATE = .8;
   
-  Avatar(Player iplayer, PVector ip, PVector ir, PVector isize)
+  Avatar(PVector ip, PVector ir, PVector isize, String ipre, int status)
   {
     super(ip, ir, isize);
     type = "avatar";
-    player = iplayer;
+    prefix = ipre;
     laser = new Laser(0.6, 0.6, 0.6, 0.6, new PVector(p.x, p.y-isize.y, p.z)); //set it to apex, later.
-    println("new Avatar!", p, r, player.prefix);
-    isLiving = 1;
+    println("new Avatar!", p, r, prefix);
+    isLiving = status;
     
     lifespan = 0.0;
     melee = 0.0;
@@ -74,7 +74,7 @@ class Avatar extends O3DCone
       SHADER_LASER.set("thresh2", 0.9 * lifespan * lifespan);
       
       SHADER_LASER.set("rate1", 30.0);
-      SHADER_LASER.set("rate2", 20.0);
+      SHADER_LASER.set("rate2", 30.0);
       SHADER_LASER.set("color", shiftGlobalColors());
       shader(SHADER_LASER);
       laser.update(); //right now, this's all that'd be in "update" for any object excepting the camera.
@@ -130,11 +130,6 @@ class Avatar extends O3DCone
     {
       isLiving = 0;
       lifespan = 1.0;
-      if (player != null)
-      {
-        player.avatar = null;
-        player = null;
-      }
       return 0;
     }
     return -1;
@@ -142,6 +137,6 @@ class Avatar extends O3DCone
   
   void print()
   {
-    println("Avatar for player "+player.prefix+"", "position:", p, "rotation", r);
+    println("Avatar for player "+prefix+"", "position:", p, "rotation", r);
   }
 }

@@ -11,31 +11,39 @@ class Map
     objects = new CopyOnWriteArrayList<Object3D>();
   }
   
-  int add(Object3D iobject) //type-check to include "?" right now.
+  Object3D getObject(int iindx)
   {
-    int isIn = objects.indexOf(iobject);
-    int isInBounds = checkBounds(iobject.p);
-    if ( (isIn == -1) && (isInBounds == -1) )
+    if (iindx >= 0 && iindx < objects.size())
     {
-      objects.add(iobject);
-      //println(iobject.p, iobject.r, iobject.radius);
-      
-      return 0;
+      Object3D oobject = objects.get(iindx);
+      return oobject;
     }
     
-    return -1;
+    return null;
   }
   
-  int remove(Object3D iobject)
+  Avatar getAvatar(int iindx)
   {
-    int indexof = objects.indexOf(iobject);
-    if (indexof != -1)
+    if (iindx >= 0 && iindx < objects.size())
     {
-      objects.remove(iobject);
-      return indexof;
+      Object3D oobject = objects.get(iindx);
+      if (oobject.type.equals("avatar"));
+      {
+        return (Avatar) oobject;
+      }
     }
     
-    return -1;
+    return null;
+  }
+  
+  boolean add(Object3D iobject) //type-check to include "?" right now.
+  {
+      return objects.addIfAbsent(iobject);
+  }
+  
+  boolean remove(Object3D iobject)
+  {
+      return objects.remove(iobject);
   }
   
   void clear()
@@ -43,40 +51,21 @@ class Map
     objects.clear();
   }
   
-  int move(Object3D iobject, PVector ipos, PVector irot)
-  {
-    int iindx = this.remove(iobject);
-    int isInBounds = checkBounds(ipos);
-    if ( (iindx != -1) ) //janky as shit.
-    {
-      iobject.set(ipos, irot);
-      this.add(iobject); 
-      return iindx;
-    }
-    else 
-    {
-      return -1;
-    }
-  }
   
   void update()
   {
-    for (int i = objects.size() - 1; i >= 0; i--)
+    for (ListIterator<Object3D> it = objects.listIterator(); it.hasNext();)
     {
-      Object3D object = objects.get(i);
+      Object3D object = it.next();
       object.update();
-      if (object.isLiving == -1)
-      {
-        objects.remove(object);
-      }
     }
   }
   
   void display()
   {
-    for (int i = objects.size() - 1; i >= 0; i--)
+    for (ListIterator<Object3D> it = objects.listIterator(); it.hasNext();)
     {
-      Object3D object = objects.get(i);
+      Object3D object = it.next();
       shader(SHADER_NOISE);
       object.display();
       resetShader();
@@ -87,12 +76,13 @@ class Map
   {
     for (ListIterator<Object3D> it = objects.listIterator(); it.hasNext();)
     {
+      int oindx = it.nextIndex();
       Object3D oobject = it.next();
       PVector ic = new PVector(icoord.x, 0, icoord.z);
       PVector oc = new PVector(oobject.p.x, 0, oobject.p.z);
-      if (PVector.dist(ic, oc) <= (oobject.radius + dist))
+      if ((oobject.isLiving == 1) && (PVector.dist(ic, oc) <= oobject.radius + dist))
       {
-        return it.nextIndex(); 
+        return oindx;
       }
     }  
     return -1;
@@ -102,12 +92,13 @@ class Map
   {
     for (ListIterator<Object3D> it = objects.listIterator(); it.hasNext();)
     {
+      int oindx = it.nextIndex();
       Object3D oobject = it.next();
       PVector ic = new PVector(icoord.x, 0, icoord.z);
       PVector oc = new PVector(oobject.p.x, 0, oobject.p.z);
-      if (PVector.dist(ic, oc) <= oobject.radius)
+      if ((oobject.isLiving == 1) && (PVector.dist(ic, oc) <= oobject.radius))
       {
-        return it.nextIndex(); 
+        return oindx;
       }
     }  
     return -1;
@@ -118,12 +109,13 @@ class Map
     PVector icoord = new PVector(ix, iy, iz);
     for (ListIterator<Object3D> it = objects.listIterator(); it.hasNext();)
     {
+      int oindx = it.nextIndex();
       Object3D oobject = it.next();
       PVector ic = new PVector(icoord.x, 0, icoord.z);
       PVector oc = new PVector(oobject.p.x, 0, oobject.p.z);
-      if (PVector.dist(ic, oc) <= oobject.radius)
+      if ((oobject.isLiving == 1) && (PVector.dist(ic, oc) <= oobject.radius))
       {
-        return it.nextIndex(); 
+        return oindx;
       }
     }  
     return -1;
@@ -132,13 +124,13 @@ class Map
   float getDistFromAvatar(PVector icoord, float idist) //if an object's distance < input, return distance, else return input.
   {
     float dist = idist;
-    for (int i = objects.size() - 1; i >= 0; i--)
+    for (ListIterator<Object3D> it = objects.listIterator(); it.hasNext();)
     {
-      Object3D oobject = objects.get(i);
+      Object3D oobject = it.next();
       PVector ic = new PVector(icoord.x, 0, icoord.z);
       PVector oc = new PVector(oobject.p.x, 0, oobject.p.z);
       float dist2 = PVector.dist(ic, oc);
-      if ((oobject.type.equals("avatar")) && (dist2 < dist))
+      if ((oobject.isLiving == 1) && (oobject.type.equals("avatar")) && (dist2 < dist))
       {
         dist = dist2; 
       }
@@ -148,36 +140,30 @@ class Map
   
   int getIndexByAngle(PVector ipos, PVector iaim) 
   {
-    for (int i = objects.size() - 1; i >= 0; i--)
+    for (ListIterator<Object3D> it = objects.listIterator(); it.hasNext();)
     {
+      int oindx = it.nextIndex();
+      Object3D oobject = it.next();
       PVector vec1 = PVector.sub(iaim, ipos);
-      PVector vec2 = PVector.sub(objects.get(i).p, ipos);
+      PVector vec2 = PVector.sub(oobject.p, ipos);
+      println("isAvatar within indexByAngle:", this.isAvatar(oindx));
       vec1.y = 0;
       vec2.y = 0;
       //could individually check the xz angles (using vector2s) and the xyz angle and xz would be less forgiving.
       float vecangle = degrees(PVector.angleBetween(vec1, vec2));
-      if (vecangle <= 9)
+      if ((oobject.isLiving == 1) && (vecangle <= 9))
       {
-        return i;
+        return oindx;
       }
     }
     return -1;
   }
   
-  boolean isAvatar (int iindx)
-  {
-    if (iindx < 0 || iindx >= objects.size())
-    {
-      return false;
-    }
-    return objects.get(iindx).type.equals("avatar");
-  }
-  
   void setTex (PImage itex)
   {
-    for (int i = objects.size() - 1; i >= 0; i--)
+    for (ListIterator<Object3D> it = objects.listIterator(); it.hasNext();)
     {
-      Object3D oobject = objects.get(i);
+      Object3D oobject = it.next();
       oobject.setTex(itex);
     }
   }
@@ -186,10 +172,94 @@ class Map
   {
     println("-----MAP-----");
     println("size = "+objects.size()+"");
-    for (int i = objects.size() - 1; i >= 0; i--)
+    for (ListIterator<Object3D> it = objects.listIterator(); it.hasNext();)
     {
-      Object3D oobject = objects.get(i);
-      println("object at index "+i+": type = "+oobject.getType()+", position = "+oobject.p+", rotation = "+oobject.r+"");
+      int oindx = it.nextIndex();
+      Object3D oobject = it.next();
+      println("object at index "+oindx+": type = "+oobject.getType()+", position = "+oobject.p+", rotation = "+oobject.r+", status, "+oobject.isLiving+"");
+      if (oobject.type.equals("avatar"))
+      {
+        Avatar oavatar = (Avatar) oobject;
+        String oprefix = oavatar.prefix;
+        println("prefix = "+oprefix+"");
+      }
+      else
+      {
+        println("no prefix");
+      }
+      
     }
   }
+  
+  //-----AVATAR FUNCTIONS-----//
+  
+  boolean isAvatar (int iindx)
+  {
+    if (iindx >= 0 && iindx <= objects.size())
+    {
+      println("good index for IsAvatar "+iindx+"");
+      return objects.get(iindx).type.equals("avatar");
+    }
+    println("bad index for IsAvatar "+iindx+"");
+    return false;
+  }
+  
+  int indexFromPrefix(String ipre)
+  {
+    int oindx = -1;
+    for (ListIterator<Object3D> it = objects.listIterator(); it.hasNext();)
+    {
+      int indx = it.nextIndex();
+      Object3D oobject = it.next();
+      if (oobject.type.equals("avatar"));
+      {
+        Avatar oavatar = (Avatar) oobject;
+        if (oavatar.prefix.equals(ipre))
+        {
+          oindx = indx;
+        }
+      }
+    }
+    return oindx;
+  }
+  
+  String removePrefix(String iaddr)
+  {
+    for (ListIterator<Object3D> it = objects.listIterator(); it.hasNext();)
+    {
+      int indx = it.nextIndex();
+      Object3D oobject = it.next();
+      if (oobject.type.equals("avatar"));
+      {
+        Avatar oavatar = (Avatar) oobject;
+        if (iaddr.startsWith(oavatar.prefix))
+        {
+          String ostring = iaddr.substring(oavatar.prefix.length(), iaddr.length()); //-1 to remove the last parenthesis
+          return ostring;
+        }
+      }
+    }
+    
+    return iaddr;
+  }
+  
+  int indexFromAddrPattern(String iaddr)
+  {
+    int oindex = -1;
+    for (ListIterator<Object3D> it = objects.listIterator(); it.hasNext();)
+    {
+      int indx = it.nextIndex();
+      Object3D oobject = it.next();
+      if (oobject.type.equals("avatar"));
+      {
+        Avatar oavatar = (Avatar) oobject;
+        if (iaddr.startsWith(oavatar.prefix))
+        {
+          return indx;
+        }
+      }
+    }
+    return oindex;
+  }
 }
+ 
