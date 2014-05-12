@@ -66,9 +66,12 @@ class Map
     for (ListIterator<Object3D> it = objects.listIterator(); it.hasNext();)
     {
       Object3D object = it.next();
-      shader(SHADER_NOISE);
-      object.display();
-      resetShader();
+      if (object.isLiving != -1)
+      {
+        shader(SHADER_NOISE);
+        object.display();
+        resetShader();
+      }
     }
   }
   
@@ -211,7 +214,7 @@ class Map
     {
       int indx = it.nextIndex();
       Object3D oobject = it.next();
-      if (oobject.type.equals("avatar"));
+      if (oobject.type.equals("avatar"))
       {
         Avatar oavatar = (Avatar) oobject;
         if (oavatar.prefix.equals(ipre))
@@ -229,7 +232,7 @@ class Map
     {
       int indx = it.nextIndex();
       Object3D oobject = it.next();
-      if (oobject.type.equals("avatar"));
+      if (oobject.type.equals("avatar"))
       {
         Avatar oavatar = (Avatar) oobject;
         if (iaddr.startsWith(oavatar.prefix))
@@ -250,7 +253,7 @@ class Map
     {
       int indx = it.nextIndex();
       Object3D oobject = it.next();
-      if (oobject.type.equals("avatar"));
+      if (oobject.type.equals("avatar"))
       {
         Avatar oavatar = (Avatar) oobject;
         if (iaddr.startsWith(oavatar.prefix))

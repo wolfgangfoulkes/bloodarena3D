@@ -7,6 +7,7 @@ class Object3D
   PVector size = new PVector(0, 0, 0);
   float radius;
   String type;
+  String prefix = "no prefix";
   int isLiving = 1;
 
   
@@ -48,6 +49,14 @@ class Object3D
   {
     p = ip;
     r = ir;
+  }
+  
+  void set(PVector ip, PVector ir, PVector isize)
+  {
+    p = ip;
+    r = ir;
+    size = isize;
+    radius = max(size.x, size.z) / 2;
   }
   
   void moveTo(PVector imove)

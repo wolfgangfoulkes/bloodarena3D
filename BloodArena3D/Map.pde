@@ -85,6 +85,7 @@ class Map
       PVector oc = new PVector(oobject.p.x, 0, oobject.p.z);
       if ((oobject.isLiving == 1) && (PVector.dist(ic, oc) <= oobject.radius + dist))
       {
+        println("bounds! position: "+oobject.p+" type: "+oobject.type+"");
         return oindx;
       }
     }  
@@ -101,6 +102,7 @@ class Map
       PVector oc = new PVector(oobject.p.x, 0, oobject.p.z);
       if ((oobject.isLiving == 1) && (PVector.dist(ic, oc) <= oobject.radius))
       {
+        println("bounds! position: "+oobject.p+" type: "+oobject.type+"");
         return oindx;
       }
     }  
@@ -118,6 +120,7 @@ class Map
       PVector oc = new PVector(oobject.p.x, 0, oobject.p.z);
       if ((oobject.isLiving == 1) && (PVector.dist(ic, oc) <= oobject.radius))
       {
+        println("bounds! position: "+oobject.p+" type: "+oobject.type+"");
         return oindx;
       }
     }  
@@ -214,7 +217,7 @@ class Map
     {
       int indx = it.nextIndex();
       Object3D oobject = it.next();
-      if (oobject.type.equals("avatar"));
+      if (oobject.type.equals("avatar"))
       {
         Avatar oavatar = (Avatar) oobject;
         if (oavatar.prefix.equals(ipre))
@@ -232,7 +235,7 @@ class Map
     {
       int indx = it.nextIndex();
       Object3D oobject = it.next();
-      if (oobject.type.equals("avatar"));
+      if (oobject.type.equals("avatar"))
       {
         Avatar oavatar = (Avatar) oobject;
         if (iaddr.startsWith(oavatar.prefix))
@@ -253,7 +256,7 @@ class Map
     {
       int indx = it.nextIndex();
       Object3D oobject = it.next();
-      if (oobject.type.equals("avatar"));
+      if (oobject.type.equals("avatar"))
       {
         Avatar oavatar = (Avatar) oobject;
         if (iaddr.startsWith(oavatar.prefix))

@@ -40,6 +40,17 @@ class O3DCone extends Object3D
     cone.rotateToY(radians(r.y));
   }
   
+  void set(PVector ip, PVector ir, PVector isize)
+  {
+    super.set(ip, ir, isize);
+    cone = new Cone(APPLET, nbrSg);
+    cone.setSize(size.x / 2, size.z / 2, size.y);
+    cone.moveTo(p);
+    cone.rotateToY(radians(r.y));
+    cone.drawMode(S3D.TEXTURE);
+    cone.setTexture(terrainTexCur);
+  }
+  
   void update() //this'll cause more rather than fewer problems. movements will be small enough at a time, that there shouldn't be an issue.
   {
     cone.setTexture(terrainTexCur);

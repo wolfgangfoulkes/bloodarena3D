@@ -21,7 +21,7 @@ class Avatar extends O3DCone
     type = "avatar";
     prefix = ipre;
     laser = new Laser(0.6, 0.6, 0.6, 0.6, new PVector(p.x, p.y-isize.y, p.z)); //set it to apex, later.
-    println("new Avatar!", p, r, prefix);
+    //println("new Avatar!", p, r, prefix);
     isLiving = status;
     
     lifespan = 0.0;

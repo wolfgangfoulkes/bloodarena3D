@@ -18,14 +18,14 @@ boolean connected = false;
 ///////////****OSC****\\\\\\\\\\\\\
 OscP5 pos_in;
 OscP5 oscP5;
-int lport = 12002;
+int lport = 12001;
 int coutport = 14000;
 int cinport = 14001;
 int bcport = 32000;
 String BROADCAST_LOCATION = "169.254.76.238";
 NetAddress myLocation;
 NetAddress myBroadcastLocation; 
-String myprefix = "/twerk";
+String myprefix = "/tw33k";
 
 PApplet APPLET = this;
 Map map;
@@ -280,9 +280,10 @@ public void zButtonPing(int ping)
 //-----OSC RECIEVE
 void oscEvent(OscMessage theOscMessage) 
 {
-  //println("###2 received an osc message with addrpattern "+theOscMessage.addrPattern()+" and typetag "+theOscMessage.typetag());
+  //println("###1 received an osc message with addrpattern "+theOscMessage.addrPattern()+" and typetag "+theOscMessage.typetag());
   //theOscMessage.print();
-  if (IS_INIT == false) { 
+  if (IS_INIT == false) 
+  { 
     println("failed to recieve"); 
     return;
   }
@@ -292,19 +293,20 @@ void oscEvent(OscMessage theOscMessage)
   String messagetag = theOscMessage.typetag();
   String iaddr = map.removePrefix(messageaddr);
   int isin = map.indexFromAddrPattern(messageaddr); //this could be the only check function, because "begins with" is the same as "equals"
-
+  
   //player initialization message. 
   if (messageaddr.equals("/players/add")) //remember this fucking string functions you fucking cunt don't fuck up and fucking == with two strings.
   {
     connected = true; //ought to be another message that just sets this.
     String iprefix = theOscMessage.get(0).stringValue();
     int mapindx = map.indexFromPrefix(iprefix);
-    if ((iprefix.equals(myprefix)) || (mapindx != -1) ) 
+    if ( (iprefix.equals(myprefix)) || (mapindx != -1) ) 
     { 
       println("recieved duplicate object! prefix = "+iprefix+""); map.print();
       return;
     }
-    Avatar iavatar = new Avatar(new PVector(0, 0, 0), new PVector(0, 0, 0), new PVector(1000, 1000, 1000), iprefix, -1);
+    PVector isize = new PVector(random(20, 90), random(90, 180), random(20, 90)); //set size here, just once.
+    Avatar iavatar = new Avatar(new PVector(0, 0, 0), new PVector(0, 0, 0), isize, iprefix, -1);
     if (map.add(iavatar)) { println("new Avatar added to map! prefix = "+iprefix+""); map.print(); }
     else { println("failed to add object to map! prefix = "+iprefix+""); map.print(); }
   }
@@ -422,12 +424,12 @@ void oscEvent(OscMessage theOscMessage)
 
       PVector ip = new PVector(ix, iy, iz); //ignore lookheight
       PVector ir = new PVector(irx, iry, irz); //don't rotate avatar
-      PVector ivec = adjustY(new PVector(ix, iy, iz), terrain, height_OFFSET);
-      PVector isize = new PVector(random(20, 90), random(90, 180), random(20, 90));  
-      Avatar avatar = new Avatar(ivec, new PVector(0, 0, 0), isize, iaddr, -1);
-      if (map.checkBounds(ip) == -1)
+      PVector ivec = adjustY(new PVector(ix, iy, iz), terrain, height_OFFSET); 
+      
+      if (map.checkBounds(ivec) == -1)
       {
-        ia = avatar;
+        ia.set(ivec, ir);
+        ia.isLiving = 1;
       }
     }
   }
@@ -514,10 +516,12 @@ void keyPressed()
   case 'I': 
     loop(); 
     SHOTS = 10; 
-    if (map.checkBounds(TEMP_SPAWN) == -1) { 
+    if (map.checkBounds(TEMP_SPAWN) == -1) 
+    { 
       cam.spawnCamera(TEMP_SPAWN, new PVector(0, 0, 0));
     } 
-    else { 
+    else 
+    { 
       println("spawning out of bounds at: "+TEMP_SPAWN+"");
     } 
     break;
