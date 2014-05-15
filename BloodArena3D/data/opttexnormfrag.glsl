@@ -41,7 +41,7 @@ float getLargestNorm(sampler2D itex, vec2 ires);
 
 void main(void)
 {
-	vec3 filtereded;
+	vec3 filtered;
 
 	vec2 pos = ( gl_FragCoord.xy / resolution.xy );
 	vec2 m = ( mouse.xy / resolution.xy );
@@ -56,6 +56,7 @@ void main(void)
 	
 	if (norm < floor) { discard; }
 	else if (norm >= ceil) { norm = 1.0; }
+    
     
 	if ( d > circle_radius )
 	{
@@ -98,8 +99,7 @@ vec3 clouds(vec2 ipos, float icover, float isharpness)
 	float f = fbm( 1.0*p );
 	
 	float c = f - (1.0 - icover);
-	if ( c < 0.0 )
-		c = 0.0;
+	if ( c < 0.0 ) { c = 0.0; }
 	
 	f = 1.0 - (pow(isharpness, c));
 	
@@ -144,7 +144,7 @@ float getSmallestNorm(sampler2D itex, vec2 ires)
         {
             vec2 coor = vec2(i, ii);
             vec3 tex = texture2D(itex, coor);
-            nm = distance(itex, vec3(0.0, 0.0, 0.0)) //replace this to moodify for luminance or saturation or whatever else
+            nm = distance(itex, vec3(0.0, 0.0, 0.0)); //replace this to moodify for luminance or saturation or whatever else
             if (nm < snm) { snm = nm; }
         }
     }
@@ -162,7 +162,7 @@ float getLargestNorm(sampler2D itex, vec2 ires)
         {
             vec2 coor = vec2(i, ii);
             vec3 tex = texture2D(itex, coor);
-            nm = distance(itex, vec3(0.0, 0.0, 0.0)) //replace this to moodify for luminance or saturation or whatever else
+            nm = distance(itex, vec3(0.0, 0.0, 0.0)); //replace this to moodify for luminance or saturation or whatever else
             if (nm > lnm) { lnm = nm; }
         }
     }
