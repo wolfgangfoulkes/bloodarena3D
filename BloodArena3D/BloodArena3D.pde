@@ -104,9 +104,9 @@ void setup()
   pos_in.plug(this, "zButtonPing", "/nunchuck/Zbutton");
 
   oscP5 = new OscP5(this, lport);
-  oscP5.plug(this, "hostAdd", "/host/add");
-  oscP5.plug(this, "hostRemove", "/host/remove");
-  oscP5.plug(this, "hostObject", "/host/object");
+  //oscP5.plug(this, "hostAdd", "/host/add");
+  //oscP5.plug(this, "hostRemove", "/host/remove");
+  //oscP5.plug(this, "hostObject", "/host/object");
 
   myLocation = new NetAddress("127.0.0.1", coutport);
   myBroadcastLocation = new NetAddress(BROADCAST_LOCATION, bcport);
@@ -333,7 +333,8 @@ public void accelData(int x, int y, int z)
 
 
 //-----OSC RECIEVE
-void hostAdd(String iprefix)
+
+/*void hostAdd(String iprefix)
 {
   IS_CONNECTED = true;
   int mapindx = map.indexFromPrefix(iprefix);
@@ -348,6 +349,7 @@ void hostAdd(String iprefix)
   if (map.add(iavatar)) { println("new Avatar added to map! prefix = "+iprefix+""); map.print(); }
   else { println("failed to add object to map! prefix = "+iprefix+""); map.print(); }
 }
+*/
 
 void oscEvent(OscMessage theOscMessage) 
 {
@@ -366,7 +368,7 @@ void oscEvent(OscMessage theOscMessage)
   int isin = map.indexFromAddrPattern(messageaddr); //this could be the only check function, because "begins with" is the same as "equals"
 
   //player initialization message. 
-  if (messageaddr.equals("/players/add")) //remember this fucking string functions you fucking cunt don't fuck up and fucking == with two strings.
+  if (messageaddr.equals("/host/add")) //remember this fucking string functions you fucking cunt don't fuck up and fucking == with two strings.
   {
     IS_CONNECTED = true; //ought to be another message that just sets this.
     String iprefix = theOscMessage.get(0).stringValue();
@@ -390,7 +392,7 @@ void oscEvent(OscMessage theOscMessage)
   }
 
   //player removal message
-  if (messageaddr.equals("/players/remove")) //remember this fucking string functions you fucking cunt don't fuck up and fucking == with two strings.
+  if (messageaddr.equals("/host/remove")) //remember this fucking string functions you fucking cunt don't fuck up and fucking == with two strings.
   {
     String iprefix = theOscMessage.get(0).stringValue();
     int mapindx = map.indexFromPrefix(iprefix);
@@ -407,7 +409,7 @@ void oscEvent(OscMessage theOscMessage)
     return;
   }
 
-  if (messageaddr.equals("/object") && messagetag.equals("ffffffs"))
+  if (messageaddr.equals("/host/object") && messagetag.equals("ffffffs"))
   {
     float ix = theOscMessage.get(0).floatValue();
     float iy = theOscMessage.get(1).floatValue();
@@ -595,9 +597,6 @@ void keyPressed()
   case 'm': 
     acc.y = -1; 
     break;
-  case 'P': 
-    newPlayer(); 
-    break;
   case 'O': 
     sendExplosion(); 
     break;
@@ -610,6 +609,7 @@ void keyPressed()
   case 'z': 
     melee(); 
     break;
+
   }
 }
 

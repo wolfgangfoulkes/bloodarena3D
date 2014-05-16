@@ -13,6 +13,7 @@ varying vec4 vertTexCoord;
 uniform sampler2D texture;
 
 uniform vec2 resolution;
+uniform vec2 texres;
 uniform float time;
 uniform vec2 mouse;
 
@@ -35,51 +36,32 @@ float fbm( vec2 p );
 float hash( float n );
 vec3 clouds(vec2 ipos, float icover, float isharpness);
 
-float getSmallestNorm(sampler2D itex, vec2 ires);
-float getLargestNorm(sampler2D itex, vec2 ires);
-//float getAverageNormal //just a thought for funsies
 
 void main(void)
 {
-	vec3 filtered;
+	vec3 filtered = vec3(0.0);
 
-	vec2 pos = ( gl_FragCoord.xy / resolution.xy );
+	vec2 position = ( gl_FragCoord.xy / resolution.xy );
 	vec2 m = ( mouse.xy / resolution.xy );
+
+	float noize = clamp(cos(position.x*1000.0+cos(position.y*489.9+time+position.x*50.0)*1450.0), 0.0, 1.0);
 
     //mix with clouds
 	vec3 dry = texture2D(texture, vertTexCoord.st).xyz * vertColor.xyz;
-    vec3 cloudcolor = clouds(pos, cover, sharpness);
-    vec3 mixed = mix(dry, cloudcolor, mix);
-
-    //white in resulting mix.
+    	vec3 cloudcolor = clouds(position, cover, sharpness);
+    	vec3 mixed = mix(dry, cloudcolor, mix);
 	float norm = distance(mixed.xyz, vec3(0.0));
-	
-	if (norm < floor) { discard; }
-	else if (norm >= ceil) { norm = 1.0; }
-    
-    
-	if ( d > circle_radius )
-	{
-		filtered = vec3(norm) * vec3(noise);
-	}
-	
-	else if ( d < (circle_radius - border))
-	{
-        filtered = vec3(norm) * vec3(noise);
-	}
 
-	else if (r >= .5)
+	if (norm <= floor)
 	{
-		filtered = vec3(norm) * vec3(noise) * color;
+		discard;
 	}
-    
-    else
-    {
-        discard;
-    }
+	else
+	{
+		filtered = vec3(norm) * vec3(noize) * color;
+	}
 
 	gl_FragColor = vec4(filtered, alpha);
-
 }
 
 vec3 clouds(vec2 ipos, float icover, float isharpness)
@@ -131,43 +113,6 @@ float fbm( vec2 p )
 float hash( float n )
 {
 	return fract(sin(n)*43758.5453);
-}
-
-float getSmallestNorm(sampler2D itex, vec2 ires)
-{
-    
-    float snm = 0.0;
-    
-    for (int i = 0; i <= ires.y; i++)
-    {
-        for (int ii = 0; ii < ires.x; ii++)
-        {
-            vec2 coor = vec2(i, ii);
-            vec3 tex = texture2D(itex, coor);
-            nm = distance(itex, vec3(0.0, 0.0, 0.0)); //replace this to moodify for luminance or saturation or whatever else
-            if (nm < snm) { snm = nm; }
-        }
-    }
-    
-    return snm;
-}
-
-float getLargestNorm(sampler2D itex, vec2 ires)
-{
-    float lnm = 1.0;
-    
-    for (int i = 0; i <= ires.y; i++)
-    {
-        for (int ii = 0; ii < ires.x; ii++)
-        {
-            vec2 coor = vec2(i, ii);
-            vec3 tex = texture2D(itex, coor);
-            nm = distance(itex, vec3(0.0, 0.0, 0.0)); //replace this to moodify for luminance or saturation or whatever else
-            if (nm > lnm) { lnm = nm; }
-        }
-    }
-    
-    return lnm;
 }
 
 /*
