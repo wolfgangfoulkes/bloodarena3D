@@ -39,6 +39,6 @@ void main( void ) {
         wet = vec3(r, 1.0, b);
 	}
 	
-	gl_FragColor = vec4(wet * color,alpha);
+	gl_FragColor = vec4(wet * color, alpha); 
 	
 }

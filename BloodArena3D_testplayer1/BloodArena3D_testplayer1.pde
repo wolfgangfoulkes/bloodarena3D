@@ -11,22 +11,21 @@ import shapes3d.utils.*;
 import shapes3d.animation.*;
 
 int ADEBUG = 0;
-PVector TEMP_SPAWN = new PVector(100, 50, 0);
-PVector TEMP_ROT = new PVector(0, -90, 0);
+PVector TEMP_SPAWN = new PVector(0, 0, 0);
 boolean IS_INIT = false;
-boolean IS_CONNECTED = false;
+boolean IS_CONNECTED = true;
 
 ///////////****OSC****\\\\\\\\\\\\\
 OscP5 pos_in;
 OscP5 oscP5;
-int lport = 12001;
+int lport = 12000;
 int coutport = 14000;
 int cinport = 14001;
 int bcport = 32000;
 String BROADCAST_LOCATION = "169.254.144.125";
 NetAddress myLocation;
 NetAddress myBroadcastLocation; 
-String MY_PREFIX = "/tw33k";
+String MY_PREFIX = "/tw33z";
 
 PApplet APPLET = this;
 Map map;
@@ -93,7 +92,7 @@ boolean sketchFullScreen()
 void setup() 
 {
   smooth();
-  size(500, 500, P3D);
+  size(900, 900, P3D);
   //size(displayWidth, displayHeight, P3D);
   frameRate(24);
 
@@ -334,6 +333,7 @@ public void accelData(int x, int y, int z)
 
 
 //-----OSC RECIEVE
+
 /*void hostAdd(String iprefix)
 {
   IS_CONNECTED = true;
@@ -551,7 +551,7 @@ void keyPressed()
     loop(); 
     SHOTS = 10; 
     if (map.checkBounds(TEMP_SPAWN) == -1) { 
-      cam.spawnCamera(TEMP_SPAWN, TEMP_ROT);
+      cam.spawnCamera(TEMP_SPAWN, new PVector(0, 0, 0));
     } 
     else { 
       println("spawning out of bounds at: "+TEMP_SPAWN+"");
@@ -597,9 +597,6 @@ void keyPressed()
   case 'm': 
     acc.y = -1; 
     break;
-  case 'P': 
-    newPlayer(); 
-    break;
   case 'O': 
     sendExplosion(); 
     break;
@@ -612,6 +609,7 @@ void keyPressed()
   case 'z': 
     melee(); 
     break;
+
   }
 }
 

@@ -26,6 +26,7 @@ uniform float mix;
 uniform float periods;
 uniform float rate;
 
+
 uniform float cover; //.6 //clouds v. black
 uniform float sharpness; //.003 //at 0 this is just black and white
 
@@ -40,11 +41,11 @@ vec3 clouds(vec2 ipos, float icover, float isharpness);
 void main(void)
 {
 	vec3 filtered = vec3(0.0);
-
+    
 	vec2 position = ( gl_FragCoord.xy / resolution.xy );
 	vec2 m = ( mouse.xy / resolution.xy );
 
-	float noize = clamp(cos(position.x*1000.0+cos(position.y*489.9+time+position.x*50.0)*1450.0), 0.0, 1.0);
+	float noize = cos(position.x*1000.0+cos(position.y*489.9+time+position.x*50.0)*1450.0); //range is -1 - 1
 
     //mix with clouds
 	vec3 dry = texture2D(texture, vertTexCoord.st).xyz * vertColor.xyz;
@@ -60,6 +61,7 @@ void main(void)
 	{
 		filtered = vec3(norm) * vec3(noize) * color;
 	}
+    
 
 	gl_FragColor = vec4(filtered, alpha);
 }
@@ -112,7 +114,7 @@ float fbm( vec2 p )
 
 float hash( float n )
 {
-	return fract(sin(n)*43758.5453);
+	return fract(sin(n)*43758.5453); //this is 0-1
 }
 
 /*

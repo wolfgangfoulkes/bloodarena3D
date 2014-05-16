@@ -7,8 +7,8 @@ class Avatar extends O3DCone
   float melee;
 
   
-  float D_THRESH = .0001;
-  float D_RATE = .90;
+  float D_THRESH = .001;
+  float D_RATE = .95;
   float M_THRESH = .001;
   float M_RATE = .98;
   float L_THRESH = .008;
@@ -61,31 +61,16 @@ class Avatar extends O3DCone
     {
 
       super.display();
-      resetShader();
-      SHADER_LASER.set("time", (millis()) * .001 * 8); //elapsed could be set to the initial elapsed value, then mod by that number to get count from 0
-      SHADER_LASER.set("resolution", (float) width, (float) height);
-      SHADER_LASER.set("alpha", lerp(.7, .4, lifespan - 1));
       
-      SHADER_LASER.set("bars1", lerp(300.0, 1.0, (1.0 - laser.lifespan)));
-      SHADER_LASER.set("bars2", 300.0);
-      
-      SHADER_LASER.set("thresh1", 0.9);
-      SHADER_LASER.set("thresh2", 0.9 * lifespan * lifespan);
-      
-      SHADER_LASER.set("rate1", 30.0);
-      SHADER_LASER.set("rate2", 30.0);
-      SHADER_LASER.set("color", shiftGlobalColors());
-      shader(SHADER_LASER);
       laser.update(); //right now, this's all that'd be in "update" for any object excepting the camera.
       laser.display();
-      resetShader();
     }
     else if (isLiving == 0)
     {
       
       SHADER_DEATH.set("time", millis() * .001);
       SHADER_DEATH.set("resolution", (float) width, (float) height);
-      SHADER_DEATH.set("floor", lerp(.8, 1.4, 1 - lifespan)); 
+      SHADER_DEATH.set("floor", lerp(.8, 1.76, pow(1 - lifespan, 2))); //(distance between (1, 1, 1) and (0, 0, 0) is square root of 3)
       SHADER_DEATH.set("alpha", .8);
     
       SHADER_DEATH.set("mouse", (float) width/2, (float) (-acc.y * height/2) + height/2);
@@ -96,14 +81,15 @@ class Avatar extends O3DCone
       //SHADER_DEATH.set("rate", 60.0);
       
       SHADER_DEATH.set("mix", lerp(0, .6, (1 - lifespan)));
-      SHADER_DEATH.set("cover", .6); //amount of clouds v/ black 
+      SHADER_DEATH.set("cover", lerp(.8, .4, 1 - lifespan)); //, .6) //amount of clouds v/ black 
       SHADER_DEATH.set("sharpness", 0.0003); //at zero this is just white and black
       
       SHADER_DEATH.set("color", shiftGlobalColors()); //new PVector(random(1.0), 0.0, random(1.0)));
 
-      shader(SHADER_DEATH);
+      this.shader = SHADER_DEATH;
       super.display();
       resetShader();
+      this.shader = SHADER_NOISE;
     }
   }
   

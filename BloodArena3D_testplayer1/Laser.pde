@@ -7,7 +7,7 @@ class Laser
   float rate;
   float thresh;
   int elapsed;
-  
+
   Laser(float rTopX, float rTopZ, float rBotX, float rBotZ, PVector ipos)
   {
     pos = ipos;
@@ -19,9 +19,8 @@ class Laser
     laser.visible(false);
     laser.setSize(rTopX, rTopZ, rBotX, rBotZ);
     laser.setWorldPos(pos, aim);
-    
   }
-  
+
   void set(PVector ipos, PVector iaim, float irate, float ithresh)
   {
     pos = ipos;
@@ -33,7 +32,7 @@ class Laser
     thresh = ithresh;
     elapsed = 0;
   }
-  
+
   void update()
   {
     elapsed++;
@@ -44,12 +43,11 @@ class Laser
     }
     else
     {
-     lifespan = 0;
-     rate = 0;
+      lifespan = 0;
+      rate = 0;
     }
-    
   }
-  
+
   void display() //the actual visual here is kinda whatever.
   {
     PVector lpos = PVector.lerp(pos, aim, 1 - lifespan); 
@@ -60,16 +58,28 @@ class Laser
     {
       pushStyle();
       laser.visible(true);
-      //tint(255, 255, 255, itint);
+      SHADER_LASER.set("time", (millis()) * .001 * 8); //elapsed could be set to the initial elapsed value, then mod by that number to get count from 0
+      SHADER_LASER.set("resolution", (float) width, (float) height);
+      SHADER_LASER.set("alpha", 1.0);
+
+      SHADER_LASER.set("bars1", lerp(300.0, 1.0, 1 - lifespan));
+      SHADER_LASER.set("bars2", 300.0);
+
+      SHADER_LASER.set("thresh1", 0.9);
+      SHADER_LASER.set("thresh2", 0.9 * lifespan * lifespan);
+
+      SHADER_LASER.set("rate1", 30.0);
+      SHADER_LASER.set("rate2", 30.0);
+      SHADER_LASER.set("color", shiftGlobalColors());
+      shader(SHADER_LASER);
       laser.draw();
-      popStyle();
-      
+      resetShader();
     }
     else 
     {
       laser.visible(false);
       laser.draw();
     }
-
   }
 }
+
