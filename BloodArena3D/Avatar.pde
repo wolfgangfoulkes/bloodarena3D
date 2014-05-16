@@ -86,16 +86,16 @@ class Avatar extends O3DCone
       
       SHADER_DEATH.set("time", millis() * .001);
       SHADER_DEATH.set("resolution", (float) width, (float) height);
-      SHADER_DEATH.set("floor", lerp(.8, 1.8, pow((1 - lifespan), 2))); //lerp(.8, 1.0, (1 - lifespan)));
-      SHADER_DEATH.set("ceil", .8);
+      SHADER_DEATH.set("floor", lerp(0, 1.0, pow((1 - lifespan), 2))); //lerp(.8, 1.0, (1 - lifespan)));
+      SHADER_DEATH.set("ceil", lerp(.8, 0.0, pow((1 - lifespan), 2)));
       SHADER_DEATH.set("alpha", .8);
     
       SHADER_DEATH.set("mouse", (float) width/2, (float) (-acc.y * height/2) + height/2);
     
-      SHADER_DEATH.set("circle_radius", lerp(.08, 8.0, 1 - lifespan)); //relative to center of screen.
-      SHADER_DEATH.set("border", 8.0); //1.0 for filled circle
-      SHADER_DEATH.set("periods", 1000.0); //high or 1-2
-      SHADER_DEATH.set("rate", 60.0);
+      //SHADER_DEATH.set("circle_radius", lerp(.08, 8.0, 1 - lifespan)); //relative to center of screen.
+      //SHADER_DEATH.set("border", 8.0); //1.0 for filled circle
+      //SHADER_DEATH.set("periods", 1000.0); //high or 1-2
+      //SHADER_DEATH.set("rate", 60.0);
       
       SHADER_DEATH.set("mix", lerp(0, .6, (1 - lifespan)));
       SHADER_DEATH.set("cover", .6); //amount of clouds v/ black 

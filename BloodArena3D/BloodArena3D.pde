@@ -18,14 +18,14 @@ boolean connected = false;
 ///////////****OSC****\\\\\\\\\\\\\
 OscP5 pos_in;
 OscP5 oscP5;
-int lport = 12001;
+int lport = 12000;
 int coutport = 14000;
 int cinport = 14001;
 int bcport = 32000;
-String BROADCAST_LOCATION = "169.254.76.238";
+String BROADCAST_LOCATION = "169.254.240.157";
 NetAddress myLocation;
 NetAddress myBroadcastLocation; 
-String myprefix = "/tw33k";
+String myprefix = "/tw33z";
 
 PApplet APPLET = this;
 Map map;
@@ -124,7 +124,7 @@ void setup()
   SHADER_NOISE = loadShader("noisenormalizedfrag.glsl");
   SHADER_LASER = loadShader("sinelines2frag.glsl"); //needs color
   SHADER_CROSSHAIR = loadShader("circlefrag.glsl"); //needs color
-  SHADER_DEATH = loadShader("circletexdeathfrag.glsl"); //needs color
+  SHADER_DEATH = loadShader("opttexnormfrag.glsl"); //needs color
   SHADER_MELEE = loadShader("pixelfrag.glsl");
 
   println("width:", width);
