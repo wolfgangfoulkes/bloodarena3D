@@ -18,11 +18,11 @@ void setup()
 {
   oscP5 = new OscP5(this, myListeningPort);
   masterMap = new Map(1001, 1001);
-  masterMap.add(new Object3D(new PVector(100, 0, 0), new PVector(0, 0, 0), "cone"));
-  masterMap.add(new Object3D(new PVector(300, 0, 0), new PVector(0, 0, 0), "spire"));
-  masterMap.add(new Object3D(new PVector(100, 0, -100), new PVector(0, 0, 0), "spire"));
-  masterMap.add(new Object3D(new PVector(300, 0, -300), new PVector(0, 0, 0), "spire"));
-  masterMap.randomObjects(15);
+  //masterMap.add(new Object3D(new PVector(100, 0, 0), new PVector(0, 0, 0), "cone"));
+  //masterMap.add(new Object3D(new PVector(300, 0, 0), new PVector(0, 0, 0), "cone"));
+ // masterMap.add(new Object3D(new PVector(100, 0, -100), new PVector(0, 0, 0), "cone"));
+  //masterMap.add(new Object3D(new PVector(300, 0, -300), new PVector(0, 0, 0), "cone"));
+  //masterMap.randomObjects(15);
   frameRate(25);
 }
 
@@ -67,7 +67,7 @@ void oscEvent(OscMessage theOscMessage)
  
        for (int i = 0; i < clients.clients.size(); i++)
        {
-          OscMessage oaddr = new OscMessage("/players/add");
+          OscMessage oaddr = new OscMessage("/host/add");
           Client oclient = clients.clients.get(i);
           //oaddr.add(oclient.IP);
           //oaddr.add(oclient.port);
@@ -76,7 +76,7 @@ void oscEvent(OscMessage theOscMessage)
         }
        for (int i = 0; i < masterMap.objects.size(); i++)
        {
-         OscMessage ocoor = new OscMessage("/object");
+         OscMessage ocoor = new OscMessage("/host/object");
          Object3D oobj = masterMap.objects.get(i);
          ocoor.add(oobj.p.x);
          ocoor.add(oobj.p.y);
@@ -104,7 +104,7 @@ private void disconnect(String iIP, int ip, String ipre)
   {
     println("### removing "+iIP+", "+ip+", "+ipre+" from the list.");
     Client oclient = clients.clients.get(rmindx);
-    OscMessage oaddr = new OscMessage("/players/remove");
+    OscMessage oaddr = new OscMessage("/host/remove");
     oaddr.add(oclient.prefix);
     sendAll(oaddr);
     clients.clients.remove(rmindx);
