@@ -13,7 +13,7 @@ import shapes3d.animation.*;
 int ADEBUG = 0;
 PVector TEMP_SPAWN = new PVector(0, 0, 0);
 boolean IS_INIT = false;
-boolean connected = true;
+boolean IS_CONNECTED = true;
 
 ///////////****OSC****\\\\\\\\\\\\\
 OscP5 pos_in;
@@ -22,10 +22,10 @@ int lport = 12000;
 int coutport = 14000;
 int cinport = 14001;
 int bcport = 32000;
-String BROADCAST_LOCATION = "169.254.240.157";
+String BROADCAST_LOCATION = "169.254.144.125";
 NetAddress myLocation;
 NetAddress myBroadcastLocation; 
-String myprefix = "/tw33z";
+String MY_PREFIX = "/tw33z";
 
 PApplet APPLET = this;
 Map map;
@@ -89,8 +89,6 @@ boolean sketchFullScreen()
  }
  */
 
-
-
 void setup() 
 {
   smooth();
@@ -106,9 +104,9 @@ void setup()
   pos_in.plug(this, "zButtonPing", "/nunchuck/Zbutton");
 
   oscP5 = new OscP5(this, lport);
-  //oscP5.plug(this, "hostAdd", "/host/add");
-  //oscP5.plug(this, "hostRemove", "/host/remove");
-  //oscP5.plug(this, "hostObject", "/host/object");
+  oscP5.plug(this, "hostAdd", "/host/add");
+  oscP5.plug(this, "hostRemove", "/host/remove");
+  oscP5.plug(this, "hostObject", "/host/object");
 
   myLocation = new NetAddress("127.0.0.1", coutport);
   myBroadcastLocation = new NetAddress(BROADCAST_LOCATION, bcport);
@@ -137,7 +135,7 @@ void setup()
 void draw() 
 {
 
-  if ( (cam.living == false) || (connected == false) )
+  if ( (cam.living == false) || (IS_CONNECTED == false) )
   {
     background(0);
 
@@ -201,7 +199,7 @@ void disconnect(int ilport, String ipre)
 
 void sendPos(float ix, float iy, float iz, float irx, float iry, float irz) //+ rotation
 {
-  OscMessage ocoor = new OscMessage(myprefix + "/pos");
+  OscMessage ocoor = new OscMessage(MY_PREFIX + "/pos");
   ocoor.add(ix);
   ocoor.add(iy);
   ocoor.add(iz);
@@ -213,7 +211,7 @@ void sendPos(float ix, float iy, float iz, float irx, float iry, float irz) //+ 
 
 void sendShot(PVector ipos, PVector iaim, NetAddress ilocation)
 {
-  OscMessage ocoor = new OscMessage(myprefix + "/shot");
+  OscMessage ocoor = new OscMessage(MY_PREFIX + "/shot");
   ocoor.add(ipos.x);
   ocoor.add(ipos.y);
   ocoor.add(ipos.z);
@@ -225,28 +223,28 @@ void sendShot(PVector ipos, PVector iaim, NetAddress ilocation)
 
 void sendBlankPing(NetAddress ilocation)
 {
-  OscMessage oping = new OscMessage(myprefix + "/blank");
+  OscMessage oping = new OscMessage(MY_PREFIX + "/blank");
   oping.add(1);
   oscP5.send(oping, ilocation);
 }
 
 void sendKill(String iaddr, NetAddress ilocation)
 {
-  OscMessage oaddr = new OscMessage(myprefix + "/kill");
+  OscMessage oaddr = new OscMessage(MY_PREFIX + "/kill");
   oaddr.add(iaddr);
   oscP5.send(oaddr, ilocation);
 }
 
 void sendMelee(int istatus, NetAddress ilocation)
 {
-  OscMessage oint = new OscMessage(myprefix + "/melee");
+  OscMessage oint = new OscMessage(MY_PREFIX + "/melee");
   oint.add(istatus);
   oscP5.send(oint, ilocation);
 }
 
 void sendDist(float idist)
 {
-  OscMessage odist = new OscMessage(myprefix + "/distance");
+  OscMessage odist = new OscMessage(MY_PREFIX + "/distance");
   odist.add(idist);
   oscP5.send(odist, myLocation);
 }
@@ -260,7 +258,7 @@ void newPlayer()
 
 void sendExplosion() 
 { //maybe redundant, only happens on kill and death
-  OscMessage sendExplosion = new OscMessage(myprefix + "/explosion");
+  OscMessage sendExplosion = new OscMessage(MY_PREFIX + "/explosion");
   sendExplosion.add(1);
   oscP5.send(sendExplosion, myLocation);
   println("explosion Trigger sent to Chuck");
@@ -269,16 +267,88 @@ void sendExplosion()
 //-----OSC FROM CHUCK
 public void cButtonPing(int ping) 
 {
+  if (IS_INIT == false) 
+  { 
+    return;
+  }
   shoot();
 }
 
 public void zButtonPing(int ping) 
 {
+  if (IS_INIT == false) 
+  { 
+    return;
+  }
   melee();
+}
+
+public void joystickData(int x, int z) 
+{
+  if (IS_INIT == false) { 
+    return;
+  }
+  if (joystick != null)
+  {
+    if ((z > 110) && (z <= 135)) { 
+      joystick.x = 0;
+    }
+    else { 
+      joystick.x = map(constrain(z, 0, 256), 0, 256, -1, 1);
+    }
+    if ((x > 110) && (x <= 135)) { 
+      joystick.z = 0;
+    } 
+    else { 
+      joystick.z = map(constrain(x, -32, 220), -32, 220, -1, 1);
+    }
+
+    joystick.x *= 2.5;
+    joystick.z *= 2.5;
+  }
+}
+
+public void accelData(int x, int y, int z) 
+{ 
+  if (IS_INIT == false) { 
+    return;
+  }
+  if (acc != null)
+  {
+    //println("Receiving accel Data");
+    if ((x > -30) && (x <= 30)) { 
+      acc.x = 0;
+    } 
+    else { 
+      acc.x = map(constrain(x, -70, 70), -70, 70, -1, 1);
+    }
+
+    acc.y = map(constrain(y, 30, 120), 30, 120, -1, 1);
+    acc.z = acc.y;
+
+    acc.x *= -1.5;
+    acc.y *= -1.0; //this is a "set" not an "increment.
+  }
 }
 
 
 //-----OSC RECIEVE
+void hostAdd(String iprefix)
+{
+  IS_CONNECTED = true;
+  int mapindx = map.indexFromPrefix(iprefix);
+  if ( (iprefix.equals(MY_PREFIX)) || (mapindx != -1) ) 
+  { 
+    println("recieved duplicate object! prefix = "+iprefix+""); 
+    map.print();
+    return;
+  }
+  PVector isize = new PVector(random(20, 90), random(90, 180), random(20, 90)); //set size here, just once.
+  Avatar iavatar = new Avatar(new PVector(0, 0, 0), new PVector(0, 0, 0), isize, iprefix, -1);
+  if (map.add(iavatar)) { println("new Avatar added to map! prefix = "+iprefix+""); map.print(); }
+  else { println("failed to add object to map! prefix = "+iprefix+""); map.print(); }
+}
+
 void oscEvent(OscMessage theOscMessage) 
 {
   //println("###1 received an osc message with addrpattern "+theOscMessage.addrPattern()+" and typetag "+theOscMessage.typetag());
@@ -294,22 +364,29 @@ void oscEvent(OscMessage theOscMessage)
   String messagetag = theOscMessage.typetag();
   String iaddr = map.removePrefix(messageaddr);
   int isin = map.indexFromAddrPattern(messageaddr); //this could be the only check function, because "begins with" is the same as "equals"
-  
+
   //player initialization message. 
   if (messageaddr.equals("/players/add")) //remember this fucking string functions you fucking cunt don't fuck up and fucking == with two strings.
   {
-    connected = true; //ought to be another message that just sets this.
+    IS_CONNECTED = true; //ought to be another message that just sets this.
     String iprefix = theOscMessage.get(0).stringValue();
     int mapindx = map.indexFromPrefix(iprefix);
-    if ( (iprefix.equals(myprefix)) || (mapindx != -1) ) 
+    if ( (iprefix.equals(MY_PREFIX)) || (mapindx != -1) ) 
     { 
-      println("recieved duplicate object! prefix = "+iprefix+""); map.print();
+      println("recieved duplicate object! prefix = "+iprefix+""); 
+      map.print();
       return;
     }
     PVector isize = new PVector(random(20, 90), random(90, 180), random(20, 90)); //set size here, just once.
     Avatar iavatar = new Avatar(new PVector(0, 0, 0), new PVector(0, 0, 0), isize, iprefix, -1);
-    if (map.add(iavatar)) { println("new Avatar added to map! prefix = "+iprefix+""); map.print(); }
-    else { println("failed to add object to map! prefix = "+iprefix+""); map.print(); }
+    if (map.add(iavatar)) { 
+      println("new Avatar added to map! prefix = "+iprefix+""); 
+      map.print();
+    }
+    else { 
+      println("failed to add object to map! prefix = "+iprefix+""); 
+      map.print();
+    }
   }
 
   //player removal message
@@ -317,7 +394,8 @@ void oscEvent(OscMessage theOscMessage)
   {
     String iprefix = theOscMessage.get(0).stringValue();
     int mapindx = map.indexFromPrefix(iprefix);
-    if ( iprefix.equals(myprefix) || mapindx != -1 ) { 
+    if ( iprefix.equals(MY_PREFIX) || mapindx == -1 ) 
+    { 
       return;
     }
     else 
@@ -391,9 +469,9 @@ void oscEvent(OscMessage theOscMessage)
       //println("###2 received an osc message with addrpattern "+theOscMessage.addrPattern()+" and typetag "+theOscMessage.typetag());
       //theOscMessage.print();
       String is = theOscMessage.get(0).stringValue();
-      if (is.equals(myprefix)) 
+      if (is.equals(MY_PREFIX)) 
       {
-        sendKill(myprefix, myLocation);
+        sendKill(MY_PREFIX, myLocation);
         cam.living = false;
       }
       else //everything below should be encapsulated.
@@ -426,12 +504,12 @@ void oscEvent(OscMessage theOscMessage)
       PVector ip = new PVector(ix, iy, iz); //ignore lookheight
       PVector ir = new PVector(irx, iry, irz); //don't rotate avatar
       PVector ivec = adjustY(new PVector(ix, iy, iz), terrain, height_OFFSET); 
-      
+
       //ia.isLiving = -1; //gotta do this to check bounds
       //if (map.checkBounds(ivec) == -1)
       //{
-        ia.set(ivec, new PVector(0, 0, 0));
-        ia.isLiving = 1;
+      ia.set(ivec, new PVector(0, 0, 0));
+      ia.isLiving = 1;
       //}
     }
   }
@@ -445,88 +523,93 @@ public void chuckRespawn(int in)
   if (randomSpawnCamera(5000) == -1)
   {
     cam.living = false; 
-    sendKill(myprefix, myLocation);
-    sendKill(myprefix, myBroadcastLocation);
+    sendKill(MY_PREFIX, myLocation);
+    sendKill(MY_PREFIX, myBroadcastLocation);
     println("chaos reigns!");
   }
 }
 
 
-public void joystickData(int x, int z) 
-{
-  if (IS_INIT == false) { 
-    return;
-  }
-  if (joystick != null)
-  {
-    if ((z > 110) && (z <= 135)) { 
-      joystick.x = 0;
-    }
-    else { 
-      joystick.x = map(constrain(z, 0, 256), 0, 256, -1, 1);
-    }
-    if ((x > 110) && (x <= 135)) { 
-      joystick.z = 0;
-    } 
-    else { 
-      joystick.z = map(constrain(x, -32, 220), -32, 220, -1, 1);
-    }
-
-    joystick.x *= 2.5;
-    joystick.z *= 2.5;
-  }
-}
-
-public void accelData(int x, int y, int z) 
-{ 
-  if (IS_INIT == false) { 
-    return;
-  }
-  if (acc != null)
-  {
-    //println("Receiving accel Data");
-    if ((x > -30) && (x <= 30)) { 
-      acc.x = 0;
-    } 
-    else { 
-      acc.x = map(constrain(x, -70, 70), -70, 70, -1, 1);
-    }
-
-    acc.y = map(constrain(y, 30, 120), 30, 120, -1, 1);
-    acc.z = acc.y;
-
-    acc.x *= -1.5;
-    acc.y *= -1.0; //this is a "set" not an "increment.
-  }
-}
-
 void keyPressed()
 {
   switch(key)
   {
-  case 'C': disconnect(lport, myprefix); connect(lport, myprefix); break;
-  case 'f': disconnect(lport, myprefix); connected = false; break;
-  case 'M': map.print(); break;
-  case 'I':  loop(); SHOTS = 10; if (map.checkBounds(TEMP_SPAWN) == -1) { cam.spawnCamera(TEMP_SPAWN, new PVector(0, 0, 0)); } else { println("spawning out of bounds at: "+TEMP_SPAWN+"");} break;
-  case 'v': cam.living = false; sendKill(myprefix, myLocation); sendKill(myprefix, myBroadcastLocation); break; //cam.living = false; killCamera(); (myprefix); break;
+  case 'C': 
+    disconnect(lport, MY_PREFIX); 
+    connect(lport, MY_PREFIX); 
+    break;
+  case 'f': 
+    disconnect(lport, MY_PREFIX); 
+    IS_CONNECTED = false; 
+    break;
+  case 'M': 
+    map.print(); 
+    break;
+  case 'I':  
+    loop(); 
+    SHOTS = 10; 
+    if (map.checkBounds(TEMP_SPAWN) == -1) { 
+      cam.spawnCamera(TEMP_SPAWN, new PVector(0, 0, 0));
+    } 
+    else { 
+      println("spawning out of bounds at: "+TEMP_SPAWN+"");
+    } 
+    break;
+  case 'v': 
+    cam.living = false; 
+    sendKill(MY_PREFIX, myLocation); 
+    sendKill(MY_PREFIX, myBroadcastLocation); 
+    break; //cam.living = false; killCamera(); (MY_PREFIX); break;
 
     //temp testing variables
-  case 'w': joystick.x = 2; break;
-  case 'x': joystick.x = -2; break;
-  case 'a': joystick.z = -2; break;
-  case 'd': joystick.z = 2; break;
-  case 's': joystick.x = 0; joystick.z = 0; break;
+  case 'w': 
+    joystick.x = 2; 
+    break;
+  case 'x': 
+    joystick.x = -2; 
+    break;
+  case 'a': 
+    joystick.z = -2; 
+    break;
+  case 'd': 
+    joystick.z = 2; 
+    break;
+  case 's': 
+    joystick.x = 0; 
+    joystick.z = 0; 
+    break;
 
-  case 'j': acc.x = -1;  break;
-  case 'k': acc.x = 0; acc.y = 0; break;
-  case 'l': acc.x = 1; break;
-  case 'u': acc.y = 1; break;
-  case 'm': acc.y = -1; break;
-  case 'P': newPlayer(); break;
-  case 'O': sendExplosion(); break;
-  case 'T': initTextures();  break;
-  case 'c': shoot(); break;
-  case 'z': melee(); break;
+  case 'j': 
+    acc.x = -1;  
+    break;
+  case 'k': 
+    acc.x = 0; 
+    acc.y = 0; 
+    break;
+  case 'l': 
+    acc.x = 1; 
+    break;
+  case 'u': 
+    acc.y = 1; 
+    break;
+  case 'm': 
+    acc.y = -1; 
+    break;
+  case 'P': 
+    newPlayer(); 
+    break;
+  case 'O': 
+    sendExplosion(); 
+    break;
+  case 'T': 
+    initTextures();  
+    break;
+  case 'c': 
+    shoot(); 
+    break;
+  case 'z': 
+    melee(); 
+    break;
   }
 }
 
@@ -619,7 +702,6 @@ void shoot()
       println("shootin' blanks!");
     }
   }
-
 }
 
 void melee()

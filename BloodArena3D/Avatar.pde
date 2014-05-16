@@ -3,7 +3,6 @@ class Avatar extends O3DCone
   String prefix;
   Laser laser;
   //could have a "shader" parameter that is set along with death and melee. then, we don't have to call so much if/then in display
-  //PShader shader;
   float lifespan;
   float melee;
 

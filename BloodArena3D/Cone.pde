@@ -5,8 +5,7 @@ class O3DCone extends Object3D
 {
   Cone cone;
   int nbrSg;
-  String tag;
-  int tagno;
+  PShader shader;
   
   O3DCone(PVector ip, PVector ir, PVector isize)
   {
@@ -19,6 +18,7 @@ class O3DCone extends Object3D
     cone.rotateToY(radians(r.y));
     cone.drawMode(S3D.TEXTURE);
     cone.setTexture(terrainTexCur);
+    shader = SHADER_NOISE;
   }
   
   O3DCone(float ix, float iy, float iz, float irx, float iry, float irz, PVector isize)
@@ -31,6 +31,7 @@ class O3DCone extends Object3D
     cone.rotateToY(radians(r.y));
     cone.drawMode(S3D.TEXTURE);
     cone.setTexture(terrainTexCur);
+    shader = SHADER_NOISE;
   }
   
   void set(PVector ip, PVector ir)
@@ -49,6 +50,7 @@ class O3DCone extends Object3D
     cone.rotateToY(radians(r.y));
     cone.drawMode(S3D.TEXTURE);
     cone.setTexture(terrainTexCur);
+    shader = SHADER_NOISE;
   }
   
   void update() //this'll cause more rather than fewer problems. movements will be small enough at a time, that there shouldn't be an issue.
@@ -58,12 +60,15 @@ class O3DCone extends Object3D
   
   void display()
   {
+    shader(shader);
     cone.draw();
+    resetShader();
   }
   
   void setTex(PImage itex)
   {
     cone.setTexture(itex);
+    shader = SHADER_NOISE;
   }
   
   
