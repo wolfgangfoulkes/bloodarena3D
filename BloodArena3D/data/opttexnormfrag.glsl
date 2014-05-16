@@ -44,7 +44,7 @@ void main(void)
 	vec2 position = ( gl_FragCoord.xy / resolution.xy );
 	vec2 m = ( mouse.xy / resolution.xy );
 
-	float noize = cos(position.x*1000.0+cos(position.y*489.9+time+position.x*50.0)*1450.0);
+	float noize = clamp(cos(position.x*1000.0+cos(position.y*489.9+time+position.x*50.0)*1450.0), 0.0, 1.0);
 
     //mix with clouds
 	vec3 dry = texture2D(texture, vertTexCoord.st).xyz * vertColor.xyz;
@@ -56,13 +56,9 @@ void main(void)
 	{
 		discard;
 	}
-	else if (norm >= ceil)
+	else
 	{
 		filtered = vec3(norm) * vec3(noize) * color;
-	}
-	else 
-	{
-		filtered = vec3(norm) * vec3(noize);
 	}
 
 	gl_FragColor = vec4(filtered, alpha);

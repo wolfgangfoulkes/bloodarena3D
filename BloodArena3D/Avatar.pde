@@ -9,7 +9,7 @@ class Avatar extends O3DCone
 
   
   float D_THRESH = .0001;
-  float D_RATE = .94;
+  float D_RATE = .90;
   float M_THRESH = .001;
   float M_RATE = .98;
   float L_THRESH = .008;
@@ -63,7 +63,7 @@ class Avatar extends O3DCone
 
       super.display();
       resetShader();
-      SHADER_LASER.set("time", (millis()) * .001); //elapsed could be set to the initial elapsed value, then mod by that number to get count from 0
+      SHADER_LASER.set("time", (millis()) * .001 * 8); //elapsed could be set to the initial elapsed value, then mod by that number to get count from 0
       SHADER_LASER.set("resolution", (float) width, (float) height);
       SHADER_LASER.set("alpha", lerp(.7, .4, lifespan - 1));
       
@@ -86,8 +86,7 @@ class Avatar extends O3DCone
       
       SHADER_DEATH.set("time", millis() * .001);
       SHADER_DEATH.set("resolution", (float) width, (float) height);
-      SHADER_DEATH.set("floor", lerp(0, 1.0, pow((1 - lifespan), 2))); //lerp(.8, 1.0, (1 - lifespan)));
-      SHADER_DEATH.set("ceil", lerp(.8, 0.0, pow((1 - lifespan), 2)));
+      SHADER_DEATH.set("floor", lerp(.8, 1.4, 1 - lifespan)); 
       SHADER_DEATH.set("alpha", .8);
     
       SHADER_DEATH.set("mouse", (float) width/2, (float) (-acc.y * height/2) + height/2);
