@@ -13,7 +13,7 @@ import shapes3d.animation.*;
 int ADEBUG = 0;
 PVector TEMP_SPAWN = new PVector(0, 0, 0);
 boolean IS_INIT = false;
-boolean connected = false;
+boolean connected = true;
 
 ///////////****OSC****\\\\\\\\\\\\\
 OscP5 pos_in;
@@ -47,10 +47,10 @@ float STRIKE_RADIUS = 50;
 float DISTANCE_FROM_PLAYER = 500;
 float SHOTS = 0;
 
+//-----COLOR CONSTANTS
 PVector COLOR = new PVector(1.0, 0, .8);
+float COLOR_RATE = .01;
 
-//for texture syncing
-int texCycle = 0;
 
 //*******Texture Arrays*******\\ 
 
@@ -71,7 +71,6 @@ String[] skyTex = new String[] {//could load fog as background
 
 PImage laserTexCur;
 PImage terrainTexCur;
-PImage skyTexCur;
 PImage killScreen;
 
 PShader SHADER_NOISE;
@@ -106,8 +105,10 @@ void setup()
   pos_in.plug(this, "cButtonPing", "/nunchuck/Cbutton");
   pos_in.plug(this, "zButtonPing", "/nunchuck/Zbutton");
 
-
   oscP5 = new OscP5(this, lport);
+  //oscP5.plug(this, "hostAdd", "/host/add");
+  //oscP5.plug(this, "hostRemove", "/host/remove");
+  //oscP5.plug(this, "hostObject", "/host/object");
 
   myLocation = new NetAddress("127.0.0.1", coutport);
   myBroadcastLocation = new NetAddress(BROADCAST_LOCATION, bcport);
@@ -152,7 +153,7 @@ void draw()
     SHADER_NOISE.set("resolution", (float) width * random(1, 1), (float) height * random(1, 1)); //these values reproduce the site's effect
     SHADER_NOISE.set("alpha", .8); 
     SHADER_NOISE.set("floor", .8);
-    SHADER_NOISE.set("ceil", .8);
+    SHADER_NOISE.set("ceil", 1.0);
     shader(SHADER_NOISE);
     terrain.draw();
     map.update();
@@ -503,84 +504,29 @@ void keyPressed()
 {
   switch(key)
   {
-  case 'C': 
-    disconnect(lport, myprefix); 
-    connect(lport, myprefix); 
-    break;
-  case 'f': 
-    disconnect(lport, myprefix); 
-    connected = false; 
-    break;
-  case 'M': 
-    map.print(); 
-    break;
-  case 'I': 
-    loop(); 
-    SHOTS = 10; 
-    if (map.checkBounds(TEMP_SPAWN) == -1) 
-    { 
-      cam.spawnCamera(TEMP_SPAWN, new PVector(0, 0, 0));
-    } 
-    else 
-    { 
-      println("spawning out of bounds at: "+TEMP_SPAWN+"");
-    } 
-    break;
-  case 'v': 
-    cam.living = false; 
-    sendKill(myprefix, myLocation); 
-    sendKill(myprefix, myBroadcastLocation); 
-    break; //cam.living = false; killCamera(); (myprefix); break;
+  case 'C': disconnect(lport, myprefix); connect(lport, myprefix); break;
+  case 'f': disconnect(lport, myprefix); connected = false; break;
+  case 'M': map.print(); break;
+  case 'I':  loop(); SHOTS = 10; if (map.checkBounds(TEMP_SPAWN) == -1) { cam.spawnCamera(TEMP_SPAWN, new PVector(0, 0, 0)); } else { println("spawning out of bounds at: "+TEMP_SPAWN+"");} break;
+  case 'v': cam.living = false; sendKill(myprefix, myLocation); sendKill(myprefix, myBroadcastLocation); break; //cam.living = false; killCamera(); (myprefix); break;
 
     //temp testing variables
-  case 'w': 
-    joystick.x = 2; 
-    break;
-  case 'x': 
-    joystick.x = -2; 
-    break;
-  case 'a': 
-    joystick.z = -2; 
-    break;
-  case 'd': 
-    joystick.z = 2; 
-    break;
-  case 's': 
-    joystick.x = 0; 
-    joystick.z = 0; 
-    break;
+  case 'w': joystick.x = 2; break;
+  case 'x': joystick.x = -2; break;
+  case 'a': joystick.z = -2; break;
+  case 'd': joystick.z = 2; break;
+  case 's': joystick.x = 0; joystick.z = 0; break;
 
-  case 'j': 
-    acc.x = -1; 
-    break;
-  case 'k': 
-    acc.x = 0; 
-    acc.y = 0; 
-    break;
-  case 'l': 
-    acc.x = 1; 
-    break;
-  case 'u': 
-    acc.y = 1; 
-    break;
-  case 'm': 
-    acc.y = -1; 
-    break;
-  case 'P': 
-    newPlayer();
-    break;
-  case 'O': 
-    sendExplosion(); 
-    break;
-  case 'T': 
-    initTextures(); 
-    break;
-  case 'c': 
-    shoot(); 
-    break;
-  case 'z': 
-    melee(); 
-    break;
+  case 'j': acc.x = -1;  break;
+  case 'k': acc.x = 0; acc.y = 0; break;
+  case 'l': acc.x = 1; break;
+  case 'u': acc.y = 1; break;
+  case 'm': acc.y = -1; break;
+  case 'P': newPlayer(); break;
+  case 'O': sendExplosion(); break;
+  case 'T': initTextures();  break;
+  case 'c': shoot(); break;
+  case 'z': melee(); break;
   }
 }
 
@@ -634,14 +580,14 @@ void initTextures() //probably not this.
   terrain.setTexture(terrainTexCur, TERRAIN_SLICES);
   terrain.drawMode(S3D.TEXTURE);
   map.setTex(terrainTexCur);
-  println("Texture for laser:", laserTexCur, "Texture for sky:", skyTexCur, "texture for terrain:", terrainTexCur);
+  println("Texture for laser:", laserTexCur, "texture for terrain:", terrainTexCur);
 }
 
 PVector shiftGlobalColors()
 {
   PVector ocolor = COLOR.get();
-  ocolor.x *= sin(3.14 * 300.0 * (millis() * .01));
-  ocolor.z *= sin(3.14 * 500.0 * (millis() * .01));
+  ocolor.x *= sin(3.14 * 300.0 * (millis() * COLOR_RATE));
+  ocolor.z *= sin(3.14 * 500.0 * (millis() * COLOR_RATE));
   return ocolor;
 }
 

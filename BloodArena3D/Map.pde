@@ -68,7 +68,7 @@ class Map
       Object3D object = it.next();
       if (object.isLiving != -1)
       {
-        shader(SHADER_NOISE);
+        shader(SHADER_NOISE); //have each thing handle their shading, prolly
         object.display();
         resetShader();
       }
