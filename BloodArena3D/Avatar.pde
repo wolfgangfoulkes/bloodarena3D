@@ -12,14 +12,14 @@ class Avatar extends O3DCone
   float M_THRESH = .001;
   float M_RATE = .98;
   float L_THRESH = .008;
-  float L_RATE = .8;
+  float L_RATE = .56;
   
   Avatar(PVector ip, PVector ir, PVector isize, String ipre, int status)
   {
     super(ip, ir, isize);
     type = "avatar";
     prefix = ipre;
-    laser = new Laser(0.6, 0.6, 0.6, 0.6, new PVector(p.x, p.y-isize.y, p.z)); //set it to apex, later.
+    laser = new Laser(0.3, 0.3, 0.3, 0.3, new PVector(p.x, p.y-isize.y, p.z)); //set it to apex, later.
     //println("new Avatar!", p, r, prefix);
     isLiving = status;
     
@@ -59,7 +59,6 @@ class Avatar extends O3DCone
   {
     if (isLiving == 1) //rather than these checks, could implement a dig where the shader is set externally, and handle most stuff in-shader with millis()
     {
-
       super.display();
       
       laser.update(); //right now, this's all that'd be in "update" for any object excepting the camera.

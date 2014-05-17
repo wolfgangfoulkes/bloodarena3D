@@ -68,17 +68,14 @@ void main(void)
 
 vec3 clouds(vec2 ipos, float icover, float isharpness)
 {
-// Wind - Used to animate the clouds
-	vec2 wind_vec = vec2(0.001 + time*0.1, 0.003 + time * 0.1);
 	
 	// Set up domain
 	vec2 q = ipos;
-	vec2 p = -1.0 + 5.0 * q + wind_vec;
+	vec2 p = -1.0 + 5.0 * q; //increasing the number we multiply by makes denser, smaller clouds, "zoomed-out"
 	
 	// Fix aspect ratio
 	p.x *= resolution.x / resolution.y;
     
-	
 	// Create noise using fBm
 	float f = fbm( 1.0*p );
 	
@@ -116,6 +113,8 @@ float hash( float n )
 {
 	return fract(sin(n)*43758.5453); //this is 0-1
 }
+
+
 
 /*
 float rand(vec2 co){
