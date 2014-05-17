@@ -50,7 +50,7 @@ class Laser
 
   void display() //the actual visual here is kinda whatever.
   {
-    PVector lpos = PVector.lerp(pos, aim, 1 - lifespan); 
+    PVector lpos = PVector.lerp(aim, pos, 1 - lifespan); //PVector.lerp(aim, pos, pow(1 - lifespan, 2)) //a more traditional effect.
     laser.setWorldPos(pos, lpos); //end -> end
     laser.drawMode(S3D.TEXTURE);
     laser.setTexture(laserTexCur);

@@ -2,7 +2,7 @@
 // serial handling
 SerialIO serial;
 string line;//the data comming in
-"/twerk" => string myPrefix;
+"/tw33z" => string myPrefix;
 second/samp => float samplerate;
 //sets the windowing of the FFT
 2 => int serialPort;
@@ -19,8 +19,8 @@ oscIn.listen();
 oscIn.event(myPrefix + "/axe, i") @=> OscEvent axeImpact;//or 
 oscIn.event(myPrefix + "/shot, i") @=> OscEvent laserImpact;//or shot
 oscIn.event(myPrefix + "/kill, s") @=> OscEvent playerKilled;
-oscIn.event("/arena/newPlayer, i") @=> OscEvent newPlayer;
-oscIn.event(myPrefix + "/explosion, i") @=> OscEvent explosion;
+oscIn.event("/host/add, s") @=> OscEvent newPlayer;
+oscIn.event(myPrefix + "/, i") @=> OscEvent explosion;
 oscIn.event(myPrefix + "/distance, f") @=> OscEvent opponentProx2;
 oscIn.event(myPrefix + "/oppProx, f,f") @=> OscEvent opponentProx3;
 oscIn.event(myPrefix + "/oppProx, f,f,f") @=> OscEvent opponentProx4;
@@ -38,7 +38,7 @@ Walking walking;
 Laser laser;
 Scream scream;
 Explosion boom;
-Announcer announcer;
+//Announcer announcer;
 //proxAlarms proxAlarm;
 soundTrack ambiance;
 WindTilt windTilt;
@@ -60,17 +60,17 @@ string x_axisS, y_axisS ,x_accS ,y_accS, z_accS,z_buttonS,c_buttonS;
 //lists serial ports
 
 1::second => now;//to make sure program does not initalize in the middle of a message
-spork ~ serialPoller();
-spork ~ sendJoyData();
-spork ~ sendAccData();
+//spork ~ serialPoller();
+//spork ~ sendJoyData();
+//spork ~ sendAccData();
 spork ~ playerKillListen();
-spork ~ newPlayerPoll();
-spork ~ explosionPoll();
+//spork ~ newPlayerPoll();
+//spork ~ explosionPoll();
 //spork ~ proximityPoll2P();
 
 while (true) {
     0.5::second => now;
-    if (runState < 1){//to avoid false triggers and uneeded noise
+    if (runState < 1){ //to avoid false triggers and uneeded noise
         1 => runState;
     }
     //<<<"x_axis :", x_axis>>>;
@@ -140,42 +140,6 @@ fun void sendRespawnPing(){
     laser.reload();
 }
 
-//////////     **********ALL POLLING FUNCTIONS*********     \\\\\\\\\\
-/*
-fun void proximityPoll2P(){
-    while(1){
-        opponentProx2 => now;   
-        if (opponentProx2.nextMsg() != 0){
-            opponentProx2.getFloat() => float opp1;
-            <<<"Float from Proximity", opp1>>>;
-            //proxAlarm.alarm(opp1);
-        }
-    }   
-}
-//if we have 3 players
-fun void proximityPoll3P(){
-    while(1){
-        opponentProx3 => now;   
-        if (opponentProx3.nextMsg() != 0){
-            opponentProx3.getFloat() => float opp1;
-            opponentProx3.getFloat() => float opp2;
-            proxAlarm.alarm(opp1, opp2);
-        }
-    }   
-}
-//if we have 4 players
-fun void proximityPoll4P(){
-    while(1){
-        opponentProx4 => now;   
-        if (opponentProx4.nextMsg() != 0){
-            opponentProx4.getFloat() => float opp1;
-            opponentProx4.getFloat() => float opp2;
-            opponentProx4.getFloat() => float opp3;
-            proxAlarm.alarm(opp1, opp2, opp3);
-        }
-    }   
-}
-*/
 fun void explosionPoll(){
     while(1){
         explosion => now;
@@ -186,7 +150,7 @@ fun void explosionPoll(){
                 <<<"Explosion">>>; 
             }
             else if (ex == 2){
-                announcer.announceOppKill();
+                //announcer.announceOppKill();
             }
             else{
                 <<<"Invalad Message on explosion OSC path", explosion.nextMsg() >>>;  
@@ -199,7 +163,7 @@ fun void newPlayerPoll(){
     while(1){
         newPlayer => now;
         if (newPlayer.nextMsg() != 0){
-            announcer.announceNewPlayer();   
+            //announcer.announceNewPlayer();   
             <<<"New player">>>;
         }   
     }
@@ -211,8 +175,7 @@ fun void playerKillListen() {
         <<<"Player Killed Called!">>>;
         if (playerKilled.nextMsg() != 0) {
             <<<playerKilled.nextMsg()>>>;
-            // playerKilled.getInt() => int one;
-            //<<<one>>>;
+            boom.impact();
             playerKilled.getString() => string playerPre;
             <<<playerPre + " killed!">>>;
             if (playerPre == myPrefix)
@@ -220,18 +183,17 @@ fun void playerKillListen() {
                 0 => runState;
                 scream.killed();
                 0.5::second => now;
-                //walking.dead();
-                0.45::second => now;//for reverb tail
+                0.45::second => now; //for reverb tail
                 scream.dead();
                 sendRespawnPing();
-                //walking.alive();
             }
             else{
-                announcer.announceOppKill();
+                //announcer.announceOppKill();
             }
         }
     }   
 }
+
 fun void serialPoller(){
     while( true )
     {

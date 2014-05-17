@@ -13,7 +13,7 @@ import shapes3d.animation.*;
 int ADEBUG = 0;
 PVector TEMP_SPAWN = new PVector(0, 0, 0);
 boolean IS_INIT = false;
-boolean IS_CONNECTED = true;
+boolean IS_CONNECTED = false;
 
 ///////////****OSC****\\\\\\\\\\\\\
 OscP5 pos_in;
@@ -344,7 +344,7 @@ public void accelData(int x, int y, int z)
     map.print();
     return;
   }
-  PVector isize = new PVector(random(20, 90), random(90, 180), random(20, 90)); //set size here, just once.
+  PVector isize = new PVector(random(20, 90), random(110, 180), random(20, 90)); //set size here, just once.
   Avatar iavatar = new Avatar(new PVector(0, 0, 0), new PVector(0, 0, 0), isize, iprefix, -1);
   if (map.add(iavatar)) { println("new Avatar added to map! prefix = "+iprefix+""); map.print(); }
   else { println("failed to add object to map! prefix = "+iprefix+""); map.print(); }

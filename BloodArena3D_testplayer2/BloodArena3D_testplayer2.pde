@@ -11,21 +11,21 @@ import shapes3d.utils.*;
 import shapes3d.animation.*;
 
 int ADEBUG = 0;
-PVector TEMP_SPAWN = new PVector(0, 0, 0);
+PVector TEMP_SPAWN = new PVector(100, 0, 50);
 boolean IS_INIT = false;
-boolean IS_CONNECTED = true;
+boolean IS_CONNECTED = false;
 
 ///////////****OSC****\\\\\\\\\\\\\
 OscP5 pos_in;
 OscP5 oscP5;
-int lport = 12000;
+int lport = 12002;
 int coutport = 14000;
 int cinport = 14001;
 int bcport = 32000;
 String BROADCAST_LOCATION = "169.254.144.125";
 NetAddress myLocation;
 NetAddress myBroadcastLocation; 
-String MY_PREFIX = "/tw33z";
+String MY_PREFIX = "/tw3rk";
 
 PApplet APPLET = this;
 Map map;
@@ -92,7 +92,7 @@ boolean sketchFullScreen()
 void setup() 
 {
   smooth();
-  size(900, 900, P3D);
+  size(500, 500, P3D);
   //size(displayWidth, displayHeight, P3D);
   frameRate(24);
 
