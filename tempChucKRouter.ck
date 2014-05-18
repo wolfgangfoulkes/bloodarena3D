@@ -2,6 +2,7 @@
 SerialIO serial;
 string line;//the data comming in
 "/tweez" => string myPrefix;
+2 => int USBPORT;
 
 //osc info to send messages for player respawn
 //set up OSC to send info
@@ -10,6 +11,8 @@ xmit.setHost("localhost",14001);
 //set up OSC to look for messages
 OscRecv oscIn;
 14000 => oscIn.port;
+
+
 //for when the player hits an object with the axe
 oscIn.listen();
 
@@ -29,7 +32,7 @@ for( int i; i< list.cap(); i++ )
     //5::second => now;
 }
 //opens serial ports
-serial.open(4, SerialIO.B9600, SerialIO.ASCII);
+serial.open(USBPORT, SerialIO.B9600, SerialIO.ASCII);
 
 
 1::second => now;//to make sure program does not initalize in the middle of a message
